@@ -15,23 +15,21 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var yearLabel: UILabel!
     @IBOutlet weak var monthLabel: UILabel!
-    @IBOutlet weak var numberOfWeeksLabel: UILabel!
+    @IBOutlet weak var startDateLabel: UILabel!
     @IBOutlet weak var calendarView : UICollectionView!
     
     private var disposeBag = DisposeBag()
     private var currentYear : Int = 0
     private var currentMonth: [Date] = []
     private var currentDate : Date = Date()
+    private var startDate: Date?
+    private var endDate: Date?
+    private var startWeekDay: Int?
     private var dateBehaviorSubject = BehaviorSubject<Date>(value: Date())
     private var currentDateBehaviorRelay = BehaviorRelay<Date>(value: Date())
     
-    private var utcFormatter : DateFormatter {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd HH:MM:SS"
-        return formatter
-    }
     
+    // MARK: viewDidLoad()
     override func viewDidLoad() {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier:"ko_KR")
@@ -40,18 +38,11 @@ class ViewController: UIViewController {
         
         self.setLabelLegnth()
         self.calendarView.dataSource = self
-//        let currentDateComponents = Calendar.current.dateComponents([.year, .month], from: self.currentDate)
-//        print("GMT Date", self.utcFormatter.string(from: self.currentDate))
-//        print("currentDate", formatter.string(from: self.currentDate))
-//        print("startOfDay", formatter.string(from: self.currentDate.startOfDay))
-//        print("startOfMonth", self.currentDate.startOfMonth)
-//        print("endOfMonth", self.currentDate.endOfDay)
-//        let gregorianCalendar = Calendar(identifier: .gregorian)
-//        print(gregorianCalendar.dateComponents([.year, .month, .day], from: stOfMonth))
-//        self.currentYear = currentDateComponents.year!
-//        self.currentMonth = currentDateComponents.month!
+        self.calendarView.delegate = self
         
-        self.dateBehaviorSubject.asObservable()
+        
+        let dateObservable : Observable<Date> = self.dateBehaviorSubject.asObservable()
+        dateObservable
             .map {Calendar.current.dateComponents([.year, .month], from :$0)}
             .filter { $0.year != nil && $0.month != nil }
             .subscribe(onNext: { d in
@@ -60,7 +51,32 @@ class ViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        numberOfWeeksLabel.text = "\(self.currentDate.numbersOfWeeks)"
+        dateObservable
+            .map {Calendar.current.component(.weekday, from: $0.startOfMonth)}
+            .subscribe(onNext: {
+                var dateComponent = DateComponents()
+                if $0 > 0{
+                    dateComponent.day = -$0 + 1
+                }
+                self.startDate = Calendar.current.date(byAdding: dateComponent, to: self.currentDate.startOfMonth)!
+            })
+            .disposed(by: disposeBag)
+        
+        dateObservable
+            .map {Calendar(identifier: .gregorian).component(.weekday, from: $0.toLocalTime().endOfMonth)}
+            .subscribe(onNext: {
+                var dateComponent = DateComponents()
+                if $0 < 7 {
+                    dateComponent.day = 7 - $0
+                }
+                self.endDate = Calendar(identifier: .gregorian).date(byAdding: dateComponent, to: self.currentDate.endOfMonth)!
+            })
+            .disposed(by: disposeBag)
+        print(self.currentDate.endOfMonth)
+        print(Calendar(identifier: .gregorian).component(.weekday, from: self.currentDate.endOfMonth))
+        print(self.endDate)
+        // SWIPE action을 한 UISwipeGetstureRecognzier에 몰아넣지 못하나?
+    
         let swipeLeftRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(_:)))
         let swipeRightRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(_:)))
         swipeLeftRecognizer.direction = .left
@@ -80,38 +96,17 @@ class ViewController: UIViewController {
     
     @objc func swipeAction(_ sender: UISwipeGestureRecognizer){
         var components = DateComponents()
-//        _ = Observable.just(sender)
-//            .map { switch $0.direction{
-//            case .left:
-//                components.month = -1
-//            case .right:
-//                components.month = 1
-//            default:
-//                components.month = 0
-//            }
-//        }
-                    
-//        var components = DateComponents()
         if sender.direction == .left {
             print("swipe left")
-//            self.currentYear += 1
             components.month = -1
         }else if sender.direction == .right {
-            print("swipe left")
-//            self.currentYear -= 1
+            print("swipe right")
             components.month = 1
         }
         
-//        print(self.currentYear)
         self.currentDate = Calendar(identifier: .gregorian).date(byAdding: components, to: self.currentDate.startOfMonth)!
         self.dateBehaviorSubject.onNext(self.currentDate)
-//        _ = Observable.just(self.currentDate)
-//            .map {Calendar.current.dateComponents([.year, .month], from :$0)}
-//            .filter {$0.year != nil && $0.month != nil}
-//            .subscribe(onNext:{
-//                self.yearLabel.text = "\(String(describing: $0.year!))"
-//                self.monthLabel.text = "\(String(describing: $0.month!))"
-//        })
+        self.calendarView.reloadData()
     }
     
     func rxSwipeAction(_ sender: UISwipeGestureRecognizer) -> Observable<Int>{
@@ -143,12 +138,9 @@ extension Date{
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1
-        components.second = -1
+//        components.second = -1
+        components.day = -1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: self.startOfMonth)!
-    }
-    
-    var numbersOfWeeks: Int{
-        return Calendar.current.component(.weekdayOrdinal, from: self.endOfMonth)
     }
     
     func getStart(of component: Calendar.Component, calendar: Calendar = Calendar.current) -> Date?{
@@ -166,29 +158,35 @@ extension Date{
 extension ViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let startOfMonth = self.currentDate.startOfMonth
-        let endOfMonth = self.currentDate.endOfMonth
         
-        guard let dayInterval = Calendar.current.dateComponents([.day], from: startOfMonth, to: endOfMonth).day else{
-            return 0
-        }
-        let firstWeek = Calendar.current.component(.weekOfYear, from: startOfMonth)
-        let lastWeek = Calendar.current.component(.weekOfYear, from: endOfMonth)
-        
-        for day in 1...(dayInterval+1) {
-            print(day)
-        }
-        return 7 * (lastWeek - firstWeek)
+        let calendarEndDate = Calendar(identifier: .gregorian).date(byAdding: DateComponents(day:1), to: self.endDate!)
+        return Calendar(identifier: .gregorian).dateComponents([.day], from: self.startDate!, to: calendarEndDate!).day!
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let dateCell = self.calendarView.dequeueReusableCell(withReuseIdentifier: "dateCell", for: indexPath)
-        dateCell.backgroundView?.backgroundColor = .cyan
+        
+        guard let dateCell = self.calendarView.dequeueReusableCell(withReuseIdentifier: "dateCell", for: indexPath) as? DateCell else{
+            return UICollectionViewCell()
+        }
+        dateCell.backgroundView?.backgroundColor = .darkGray
+        guard let curDate = Calendar.current.date(byAdding: DateComponents(day:indexPath.item), to: self.startDate ?? Date()) else {
+            return UICollectionViewCell()
+        }
+        dateCell.weekDayLabel.text = "\(Calendar.current.component(.weekday, from: curDate))"
         return dateCell
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0.3, left: 0.3, bottom: 0.3, right: 0.3)
+    }
 }
 
-extension ViewController: UICollectionViewDelegate {
+extension ViewController : UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = self.view.frame.width - 20
+        let height = self.view.frame.height
+        return CGSize(width: width / 8, height: height / 15)
+    }
+    
     
 }
