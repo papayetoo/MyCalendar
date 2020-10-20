@@ -65,7 +65,7 @@
 		001834FD24ED484B00E0B6A3 /* MyCalendar */ = {
 			isa = PBXGroup;
 			children = (
-				00DE743C2537264300A7166D /* Model */,
+				00DE743C2537264300A7166D /* ViewModel */,
 				001834FE24ED484B00E0B6A3 /* AppDelegate.swift */,
 				0018350024ED484B00E0B6A3 /* SceneDelegate.swift */,
 				0018350224ED484B00E0B6A3 /* ViewController.swift */,
@@ -77,12 +77,12 @@
 			path = MyCalendar;
 			sourceTree = "<group>";
 		};
-		00DE743C2537264300A7166D /* Model */ = {
+		00DE743C2537264300A7166D /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
 				00DE743D2537267300A7166D /* DateCell.swift */,
 			);
-			path = Model;
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		18BC004262B6B1B3954EA2EA /* Pods */ = {

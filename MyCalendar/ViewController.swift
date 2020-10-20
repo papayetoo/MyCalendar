@@ -15,7 +15,6 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var yearLabel: UILabel!
     @IBOutlet weak var monthLabel: UILabel!
-    @IBOutlet weak var startDateLabel: UILabel!
     @IBOutlet weak var calendarView : UICollectionView!
     
     private var disposeBag = DisposeBag()
@@ -28,6 +27,12 @@ class ViewController: UIViewController {
     private var dateBehaviorSubject = BehaviorSubject<Date>(value: Date())
     private var currentDateBehaviorRelay = BehaviorRelay<Date>(value: Date())
     
+    private var dateFormatter : DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "MM-dd"
+        return formatter
+    }()
     
     // MARK: viewDidLoad()
     override func viewDidLoad() {
@@ -46,8 +51,8 @@ class ViewController: UIViewController {
             .map {Calendar.current.dateComponents([.year, .month], from :$0)}
             .filter { $0.year != nil && $0.month != nil }
             .subscribe(onNext: { d in
-                self.yearLabel.text = "\(d.year!)"
-                self.monthLabel.text = "\(d.month!)"
+                self.yearLabel.text = "\(d.year!)년"
+                self.monthLabel.text = "\(d.month!)월"
             })
             .disposed(by: disposeBag)
         
@@ -72,9 +77,9 @@ class ViewController: UIViewController {
                 self.endDate = Calendar(identifier: .gregorian).date(byAdding: dateComponent, to: self.currentDate.endOfMonth)!
             })
             .disposed(by: disposeBag)
-        print(self.currentDate.endOfMonth)
-        print(Calendar(identifier: .gregorian).component(.weekday, from: self.currentDate.endOfMonth))
-        print(self.endDate)
+//        print(self.currentDate.endOfMonth)
+//        print(Calendar(identifier: .gregorian).component(.weekday, from: self.currentDate.endOfMonth))
+//        print(self.endDate)
         // SWIPE action을 한 UISwipeGetstureRecognzier에 몰아넣지 못하나?
     
         let swipeLeftRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(_:)))
@@ -138,13 +143,16 @@ extension Date{
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1
-//        components.second = -1
         components.day = -1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: self.startOfMonth)!
     }
     
-    func getStart(of component: Calendar.Component, calendar: Calendar = Calendar.current) -> Date?{
-        return calendar.dateInterval(of: component, for: self)?.start
+    var month: Int {
+        return Calendar(identifier: .gregorian).component(.month, from: self)
+    }
+    
+    var weekDay: Int {
+        return Calendar(identifier: .gregorian).component(.weekday, from: self)
     }
     
     func toLocalTime() -> Date {
@@ -165,28 +173,54 @@ extension ViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
+//        _ = Observable<UICollectionView>
+//            .just(self.calendarView)
+//            .map { $0.dequeueReusableCell(withReuseIdentifier: "dateCell", for: indexPath) as! DateCell}
+            
+        
         guard let dateCell = self.calendarView.dequeueReusableCell(withReuseIdentifier: "dateCell", for: indexPath) as? DateCell else{
             return UICollectionViewCell()
         }
-        dateCell.backgroundView?.backgroundColor = .darkGray
+        
         guard let curDate = Calendar.current.date(byAdding: DateComponents(day:indexPath.item), to: self.startDate ?? Date()) else {
             return UICollectionViewCell()
         }
-        dateCell.weekDayLabel.text = "\(Calendar.current.component(.weekday, from: curDate))"
+        
+        
+        if curDate.month != self.currentDate.month{
+            self.dateFormatter.dateFormat = "MM/dd"
+            dateCell.contentView.backgroundColor = .lightGray
+        }else{
+            self.dateFormatter.dateFormat = "dd"
+            dateCell.contentView.backgroundColor = .white
+        }
+        dateCell.dateLabel.text = "\(dateFormatter.string(from:curDate))"
+        dateCell.dateLabel.font = dateCell.dateLabel.font.withSize(13)
+        if curDate.weekDay == 1 {
+            dateCell.dateLabel.textColor = .red
+        }else{
+            dateCell.dateLabel.textColor = .black
+        }
         return dateCell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0.3, left: 0.3, bottom: 0.3, right: 0.3)
+        return UIEdgeInsets(top: 0.3, left: 0.3, bottom: 0, right: 0.3)
     }
 }
 
 extension ViewController : UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = self.view.frame.width - 20
-        let height = self.view.frame.height
-        return CGSize(width: width / 8, height: height / 15)
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        let width = self.view.frame.width - 20
+//        let height = self.view.frame.height
+//        return CGSize(width: width / 8, height: height / 15)
+//    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return CGFloat(3)
     }
     
-    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return CGFloat(3)
+    }
 }
