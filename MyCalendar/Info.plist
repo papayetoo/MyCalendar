@@ -43,6 +43,10 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Get the Holiday Info</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Get Reminder</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

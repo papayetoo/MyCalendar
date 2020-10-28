@@ -18,9 +18,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Year" textAlignment="natural" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="piq-OP-fQS">
-                                <rect key="frame" x="121" y="106" width="82" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Year" textAlignment="natural" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="piq-OP-fQS">
+                                <rect key="frame" x="150" y="137.5" width="34" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -65,9 +64,8 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Month" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ltf-1S-eww">
-                                <rect key="frame" x="254" y="105" width="50" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Month" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ltf-1S-eww">
+                                <rect key="frame" x="222.5" y="137.5" width="49" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -76,9 +74,13 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="Ltf-1S-eww" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" constant="40" id="7XR-dk-sW9"/>
                             <constraint firstItem="Pbl-fZ-5cu" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="JLb-c3-5HE"/>
+                            <constraint firstItem="piq-OP-fQS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" constant="-40" id="NOX-V0-bpc"/>
                             <constraint firstItem="Pbl-fZ-5cu" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="198" id="Otf-3e-v6e"/>
                             <constraint firstItem="Pbl-fZ-5cu" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="iWz-s5-Ylv"/>
+                            <constraint firstItem="Ltf-1S-eww" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="-300" id="pCs-cX-4Lq"/>
+                            <constraint firstItem="piq-OP-fQS" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="-300" id="xw1-Xg-IUz"/>
                             <constraint firstItem="Pbl-fZ-5cu" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="y9V-uX-EN8"/>
                         </constraints>
                     </view>

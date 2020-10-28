@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import EventKit
 import RxSwift
 import RxCocoa
 
@@ -36,51 +37,72 @@ class ViewController: UIViewController {
     
     // MARK: viewDidLoad()
     override func viewDidLoad() {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier:"ko_KR")
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        var titles: [String] = []
+        var startDates : [Date] = []
+        var endDates : [Date] = []
         
-        self.setLabelLegnth()
-        self.calendarView.dataSource = self
-        self.calendarView.delegate = self
-        
-        
-        let dateObservable : Observable<Date> = self.dateBehaviorSubject.asObservable()
-        dateObservable
-            .map {Calendar.current.dateComponents([.year, .month], from :$0)}
-            .filter { $0.year != nil && $0.month != nil }
-            .subscribe(onNext: { d in
-                self.yearLabel.text = "\(d.year!)년"
-                self.monthLabel.text = "\(d.month!)월"
-            })
-            .disposed(by: disposeBag)
-        
-        dateObservable
-            .map {Calendar.current.component(.weekday, from: $0.startOfMonth)}
-            .subscribe(onNext: {
-                var dateComponent = DateComponents()
-                if $0 > 0{
-                    dateComponent.day = -$0 + 1
+        let eventStore = EKEventStore()
+        eventStore.requestAccess(to: .event) {
+            (granted, error) in
+            if granted{
+                let calendars = eventStore.calendars(for: .event)
+                let predicate = eventStore.predicateForEvents(withStart: self.currentDate.startOfMonth, end: self.currentDate.endOfMonth, calendars: calendars)
+                let events = eventStore.events(matching: predicate)
+                for event in events{
+                    if event.calendar.title == "대한민국 공휴일"{
+                        print(event.title)
+                        guard let eventStart = event.startDate, let eventEnd = event.endDate else {
+                            continue
+                        }
+                        print(eventStart, eventEnd)
+                    }
                 }
-                self.startDate = Calendar.current.date(byAdding: dateComponent, to: self.currentDate.startOfMonth)!
-            })
-            .disposed(by: disposeBag)
+                
+            }else{
+                print("The app is not permitted to access reminders, make sure to grant permission in the settings and try again")
+            }
+        }
+    
         
-        dateObservable
-            .map {Calendar(identifier: .gregorian).component(.weekday, from: $0.toLocalTime().endOfMonth)}
-            .subscribe(onNext: {
-                var dateComponent = DateComponents()
-                if $0 < 7 {
-                    dateComponent.day = 7 - $0
-                }
-                self.endDate = Calendar(identifier: .gregorian).date(byAdding: dateComponent, to: self.currentDate.endOfMonth)!
-            })
-            .disposed(by: disposeBag)
-//        print(self.currentDate.endOfMonth)
-//        print(Calendar(identifier: .gregorian).component(.weekday, from: self.currentDate.endOfMonth))
-//        print(self.endDate)
-        // SWIPE action을 한 UISwipeGetstureRecognzier에 몰아넣지 못하나?
+//        self.setLabelLegnth()
+//        self.calendarView.dataSource = self
+//        self.calendarView.delegate = self
+//
+//
+//        let dateObservable : Observable<Date> = self.dateBehaviorSubject.asObservable()
+//        dateObservable
+//            .map {Calendar.current.dateComponents([.year, .month], from :$0)}
+//            .filter { $0.year != nil && $0.month != nil }
+//            .subscribe(onNext: { d in
+//                self.yearLabel.text = "\(d.year!)년"
+//                self.monthLabel.text = "\(d.month!)월"
+//            })
+//            .disposed(by: disposeBag)
+//
+//        dateObservable
+//            .map {Calendar.current.component(.weekday, from: $0.startOfMonth)}
+//            .subscribe(onNext: {
+//                var dateComponent = DateComponents()
+//                if $0 > 0{
+//                    dateComponent.day = -$0 + 1
+//                }
+//                self.startDate = Calendar.current.date(byAdding: dateComponent, to: self.currentDate.startOfMonth)!
+//            })
+//            .disposed(by: disposeBag)
+//
+//        dateObservable
+//            .map {Calendar(identifier: .gregorian).component(.weekday, from: $0.toLocalTime().endOfMonth)}
+//            .subscribe(onNext: {
+//                var dateComponent = DateComponents()
+//                if $0 < 7 {
+//                    dateComponent.day = 7 - $0
+//                }
+//                self.endDate = Calendar(identifier: .gregorian).date(byAdding: dateComponent, to: self.currentDate.endOfMonth)!
+//            })
+//            .disposed(by: disposeBag)
+      // SWIPE action을 한 UISwipeGetstureRecognzier에 몰아넣지 못하나?
     
         let swipeLeftRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(_:)))
         let swipeRightRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(_:)))
@@ -147,6 +169,12 @@ extension Date{
         return Calendar(identifier: .gregorian).date(byAdding: components, to: self.startOfMonth)!
     }
     
+    var endDayOfYear: Date {
+        var components = DateComponents()
+        components.month = 12 - self.month
+        return Calendar(identifier: .gregorian).date(byAdding: components, to: self)!.endOfMonth
+    }
+    
     var month: Int {
         return Calendar(identifier: .gregorian).component(.month, from: self)
     }
@@ -210,17 +238,16 @@ extension ViewController: UICollectionViewDataSource {
 }
 
 extension ViewController : UICollectionViewDelegateFlowLayout {
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        let width = self.view.frame.width - 20
-//        let height = self.view.frame.height
-//        return CGSize(width: width / 8, height: height / 15)
-//    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = self.view.frame.width - 20
+        return CGSize(width: width / 7, height: 100)
+    }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return CGFloat(3)
+        return CGFloat(1)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return CGFloat(3)
+        return CGFloat(1)
     }
 }
