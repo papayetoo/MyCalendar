@@ -11,7 +11,7 @@ import EventKit
 import RxSwift
 import RxCocoa
 
-class ViewController: UIViewController {
+class CalendarViewController: UIViewController {
     
     
     @IBOutlet weak var yearLabel: UILabel!
@@ -39,28 +39,46 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        var titles: [String] = []
-        var startDates : [Date] = []
-        var endDates : [Date] = []
+//        var titles: [String] = []
+//        var startDates : [Date] = []
+//        var endDates : [Date] = []
         
+        // event, reminder에 접근할 수 있는 클래스
         let eventStore = EKEventStore()
+        // eventStore의 접근권한을 얻는 코드 requestAccess
+        // info.plist에 Privacy 선언 필요.
+        let lastMonth = Calendar(identifier: .gregorian).date(byAdding: DateComponents(month:-1), to: self.currentDate)!
+        print(lastMonth)
         eventStore.requestAccess(to: .event) {
             (granted, error) in
             if granted{
+                // 아이폰 기본 캘릭더에 있는 event 정보를 얻어올 수 있음.
                 let calendars = eventStore.calendars(for: .event)
-                let predicate = eventStore.predicateForEvents(withStart: self.currentDate.startOfMonth, end: self.currentDate.endOfMonth, calendars: calendars)
+                // 현재 달의 초일부터 말일까지의 행사를 받아옴.
+                let predicate = eventStore.predicateForEvents(withStart: lastMonth.startOfMonth, end: lastMonth.endOfMonth, calendars: calendars)
+                // predicate에 맞는 event를 가져옴.
                 let events = eventStore.events(matching: predicate)
                 for event in events{
+                    // 대한민국 공휴일만을 가져옴.
                     if event.calendar.title == "대한민국 공휴일"{
-                        print(event.title)
+                    
                         guard let eventStart = event.startDate, let eventEnd = event.endDate else {
                             continue
                         }
-                        print(eventStart, eventEnd)
+                        
+                        let oneDay = DateComponents(day:1)
+                        var currentHoliday = eventStart
+                        print(event.title)
+                        print(Calendar.current.component(.day, from: currentHoliday), Calendar.current.component(.day, from: eventEnd))
+//                        while Calendar.current.component(.day, from: currentHoliday) != Calendar.current.component(.day, from: eventEnd) || Calendar.current.component(.month, from: currentHoliday) != Calendar.current.component(.month, from: eventEnd) {
+//                            print(currentHoliday)
+//                            currentHoliday = Calendar.current.date(byAdding: oneDay, to: eventStart)!
+//                        }
                     }
                 }
                 
             }else{
+                // 접근권한을 얻지 못했을 때의 콘솔에 message 출력
                 print("The app is not permitted to access reminders, make sure to grant permission in the settings and try again")
             }
         }
@@ -179,6 +197,10 @@ extension Date{
         return Calendar(identifier: .gregorian).component(.month, from: self)
     }
     
+    var day: Int{
+        return Calendar(identifier: .gregorian).component(.day, from: self)
+    }
+    
     var weekDay: Int {
         return Calendar(identifier: .gregorian).component(.weekday, from: self)
     }
@@ -191,7 +213,7 @@ extension Date{
     }
 }
 
-extension ViewController: UICollectionViewDataSource {
+extension CalendarViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
@@ -237,7 +259,7 @@ extension ViewController: UICollectionViewDataSource {
     }
 }
 
-extension ViewController : UICollectionViewDelegateFlowLayout {
+extension CalendarViewController : UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = self.view.frame.width - 20
         return CGSize(width: width / 7, height: 100)
