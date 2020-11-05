@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import FirebaseAuth
 import GoogleSignIn
 import FirebaseUI
@@ -16,15 +18,11 @@ class AuthViewController: UIViewController {
     @IBOutlet weak var idTxField: UITextField!
     @IBOutlet weak var pwTxField: UITextField!
     @IBOutlet weak var signInButton: UIButton!
-//    let googleSignInButton: GIDSignInButton = {
-//        let button = GIDSignInButton()
-//        button.style = .standard
-//        button.addTarget(self, action: #selector GIDSignInButtonTouched(), for: .touchUpInside)
-//        return button
-//    }()
+
     
-    var id : String?
-    var pw : String?
+    private let disposeBag = DisposeBag()
+    private var checkEmail : Bool?
+    private var checkPassword: Bool?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +35,26 @@ class AuthViewController: UIViewController {
         btnGoogleSignIn.style = .standard
         btnGoogleSignIn.frame = CGRect(x:100, y: 100, width: 48, height: 48)
         self.view.addSubview(btnGoogleSignIn)
+        
+        
+        self.idTxField
+            .rx
+            .text.orEmpty
+            .subscribe(onNext: {
+                (email) in
+                self.checkEmail = self.checkEmailValid(email)
+            }).disposed(by: self.disposeBag)
+        
+        self.pwTxField
+            .rx.text.orEmpty
+            .subscribe(onNext: {
+                (pasword) in
+                self.checkPassword = self.checkPasswordValid(password)
+            }).disposed(by: self.disposeBag)
+        
     }
+    
+    
     
     @IBAction func signInButtonTouched(_ sender: Any){
         Auth.auth().signIn(withEmail: idTxField.text!, password: pwTxField.text!){ (user, error) in
@@ -48,6 +65,15 @@ class AuthViewController: UIViewController {
                 print("login fail")
             }
         }
+    }
+    
+    private func checkEmailValid(_ email: String) -> Bool {
+        print("Check Email Valid")
+        return email.contains("@") && email.contains(".")
+    }
+
+    private func checkPasswordValid(_ password: String) -> Bool {
+        return password.count > 5
     }
     
     /*
@@ -74,7 +100,7 @@ extension AuthViewController : GIDSignInDelegate {
       let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
                                                         accessToken: authentication.accessToken)
       // ...
-      print("Google Login Success")
+        print("Google Login Success")
         performSegue(withIdentifier: "goCalendar", sender: self)
     }
 

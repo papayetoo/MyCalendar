@@ -18,6 +18,8 @@ class CalendarViewController: UIViewController {
     @IBOutlet weak var monthLabel: UILabel!
     @IBOutlet weak var calendarView : UICollectionView!
     
+    private let calendar = Calendar(identifier: .gregorian)
+    
     private var disposeBag = DisposeBag()
     private var currentYear : Int = 0
     private var currentMonth: [Date] = []
@@ -39,23 +41,19 @@ class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-//        var titles: [String] = []
-//        var startDates : [Date] = []
-//        var endDates : [Date] = []
-        
         // event, reminder에 접근할 수 있는 클래스
         let eventStore = EKEventStore()
         // eventStore의 접근권한을 얻는 코드 requestAccess
         // info.plist에 Privacy 선언 필요.
-        let lastMonth = Calendar(identifier: .gregorian).date(byAdding: DateComponents(month:-1), to: self.currentDate)!
-        print(lastMonth)
+        let lastMonth = self.calendar.date(byAdding: DateComponents(month:-1), to: self.currentDate)!
+        
         eventStore.requestAccess(to: .event) {
             (granted, error) in
             if granted{
                 // 아이폰 기본 캘릭더에 있는 event 정보를 얻어올 수 있음.
-                let calendars = eventStore.calendars(for: .event)
+                let eventCalendars = eventStore.calendars(for: .event)
                 // 현재 달의 초일부터 말일까지의 행사를 받아옴.
-                let predicate = eventStore.predicateForEvents(withStart: lastMonth.startOfMonth, end: lastMonth.endOfMonth, calendars: calendars)
+                let predicate = eventStore.predicateForEvents(withStart: lastMonth.startOfMonth, end: lastMonth.endOfMonth, calendars: eventCalendars)
                 // predicate에 맞는 event를 가져옴.
                 let events = eventStore.events(matching: predicate)
                 for event in events{
@@ -68,12 +66,7 @@ class CalendarViewController: UIViewController {
                         
                         let oneDay = DateComponents(day:1)
                         var currentHoliday = eventStart
-                        print(event.title)
-                        print(Calendar.current.component(.day, from: currentHoliday), Calendar.current.component(.day, from: eventEnd))
-//                        while Calendar.current.component(.day, from: currentHoliday) != Calendar.current.component(.day, from: eventEnd) || Calendar.current.component(.month, from: currentHoliday) != Calendar.current.component(.month, from: eventEnd) {
-//                            print(currentHoliday)
-//                            currentHoliday = Calendar.current.date(byAdding: oneDay, to: eventStart)!
-//                        }
+                        
                     }
                 }
                 
@@ -84,42 +77,42 @@ class CalendarViewController: UIViewController {
         }
     
         
-//        self.setLabelLegnth()
-//        self.calendarView.dataSource = self
-//        self.calendarView.delegate = self
-//
-//
-//        let dateObservable : Observable<Date> = self.dateBehaviorSubject.asObservable()
-//        dateObservable
-//            .map {Calendar.current.dateComponents([.year, .month], from :$0)}
-//            .filter { $0.year != nil && $0.month != nil }
-//            .subscribe(onNext: { d in
-//                self.yearLabel.text = "\(d.year!)년"
-//                self.monthLabel.text = "\(d.month!)월"
-//            })
-//            .disposed(by: disposeBag)
-//
-//        dateObservable
-//            .map {Calendar.current.component(.weekday, from: $0.startOfMonth)}
-//            .subscribe(onNext: {
-//                var dateComponent = DateComponents()
-//                if $0 > 0{
-//                    dateComponent.day = -$0 + 1
-//                }
-//                self.startDate = Calendar.current.date(byAdding: dateComponent, to: self.currentDate.startOfMonth)!
-//            })
-//            .disposed(by: disposeBag)
-//
-//        dateObservable
-//            .map {Calendar(identifier: .gregorian).component(.weekday, from: $0.toLocalTime().endOfMonth)}
-//            .subscribe(onNext: {
-//                var dateComponent = DateComponents()
-//                if $0 < 7 {
-//                    dateComponent.day = 7 - $0
-//                }
-//                self.endDate = Calendar(identifier: .gregorian).date(byAdding: dateComponent, to: self.currentDate.endOfMonth)!
-//            })
-//            .disposed(by: disposeBag)
+        self.setLabelLegnth()
+        self.calendarView.dataSource = self
+        self.calendarView.delegate = self
+
+
+        let dateObservable : Observable<Date> = self.dateBehaviorSubject.asObservable()
+        dateObservable
+            .map {Calendar.current.dateComponents([.year, .month], from :$0)}
+            .filter { $0.year != nil && $0.month != nil }
+            .subscribe(onNext: { d in
+                self.yearLabel.text = "\(d.year!)년"
+                self.monthLabel.text = "\(d.month!)월"
+            })
+            .disposed(by: disposeBag)
+
+        dateObservable
+            .map {Calendar.current.component(.weekday, from: $0.startOfMonth)}
+            .subscribe(onNext: {
+                var dateComponent = DateComponents()
+                if $0 > 0{
+                    dateComponent.day = -$0 + 1
+                }
+                self.startDate = Calendar.current.date(byAdding: dateComponent, to: self.currentDate.startOfMonth)!
+            })
+            .disposed(by: disposeBag)
+
+        dateObservable
+            .map {Calendar(identifier: .gregorian).component(.weekday, from: $0.toLocalTime().endOfMonth)}
+            .subscribe(onNext: {
+                var dateComponent = DateComponents()
+                if $0 < 7 {
+                    dateComponent.day = 7 - $0
+                }
+                self.endDate = Calendar(identifier: .gregorian).date(byAdding: dateComponent, to: self.currentDate.endOfMonth)!
+            })
+            .disposed(by: disposeBag)
       // SWIPE action을 한 UISwipeGetstureRecognzier에 몰아넣지 못하나?
     
         let swipeLeftRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(_:)))
@@ -163,7 +156,7 @@ class CalendarViewController: UIViewController {
 
 extension Date{
      var startOfDay: Date {
-           let interval = Calendar.current.dateInterval(of: .month, for: self)
+        let interval = Calendar(identifier: .gregorian).dateInterval(of: .month, for: self)
            return (interval?.start.toLocalTime())!
     }
     
@@ -266,10 +259,10 @@ extension CalendarViewController : UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return CGFloat(1)
+        return CGFloat(0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return CGFloat(1)
+        return CGFloat(0)
     }
 }

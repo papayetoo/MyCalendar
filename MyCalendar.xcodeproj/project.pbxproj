@@ -10,7 +10,6 @@
 		001834FF24ED484B00E0B6A3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001834FE24ED484B00E0B6A3 /* AppDelegate.swift */; };
 		0018350124ED484B00E0B6A3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0018350024ED484B00E0B6A3 /* SceneDelegate.swift */; };
 		0018350324ED484B00E0B6A3 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0018350224ED484B00E0B6A3 /* CalendarViewController.swift */; };
-		0018350624ED484B00E0B6A3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0018350424ED484B00E0B6A3 /* Main.storyboard */; };
 		0018350824ED484C00E0B6A3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0018350724ED484C00E0B6A3 /* Assets.xcassets */; };
 		0018350B24ED484C00E0B6A3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0018350924ED484C00E0B6A3 /* LaunchScreen.storyboard */; };
 		00DE743E2537267300A7166D /* DateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00DE743D2537267300A7166D /* DateCell.swift */; };
@@ -25,7 +24,6 @@
 		001834FE24ED484B00E0B6A3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0018350024ED484B00E0B6A3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		0018350224ED484B00E0B6A3 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
-		0018350524ED484B00E0B6A3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0018350724ED484C00E0B6A3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0018350A24ED484C00E0B6A3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0018350C24ED484C00E0B6A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,19 +69,26 @@
 		001834FD24ED484B00E0B6A3 /* MyCalendar */ = {
 			isa = PBXGroup;
 			children = (
+				002A2D3325542C9200DD97F1 /* View */,
 				00E263D225517A1A009AF471 /* GoogleService-Info.plist */,
 				00DE743C2537264300A7166D /* ViewModel */,
 				001834FE24ED484B00E0B6A3 /* AppDelegate.swift */,
 				0018350024ED484B00E0B6A3 /* SceneDelegate.swift */,
-				0018350224ED484B00E0B6A3 /* CalendarViewController.swift */,
-				0018350424ED484B00E0B6A3 /* Main.storyboard */,
 				0018350724ED484C00E0B6A3 /* Assets.xcassets */,
 				0018350924ED484C00E0B6A3 /* LaunchScreen.storyboard */,
 				0018350C24ED484C00E0B6A3 /* Info.plist */,
-				00E263CA2550381A009AF471 /* AuthViewController.swift */,
-				00E263CD25503CBF009AF471 /* Auth.storyboard */,
 			);
 			path = MyCalendar;
+			sourceTree = "<group>";
+		};
+		002A2D3325542C9200DD97F1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				00E263CD25503CBF009AF471 /* Auth.storyboard */,
+				00E263CA2550381A009AF471 /* AuthViewController.swift */,
+				0018350224ED484B00E0B6A3 /* CalendarViewController.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		00DE743C2537264300A7166D /* ViewModel */ = {
@@ -176,7 +181,6 @@
 				00E263CE25503CBF009AF471 /* Auth.storyboard in Resources */,
 				00E263D325517A1A009AF471 /* GoogleService-Info.plist in Resources */,
 				0018350824ED484C00E0B6A3 /* Assets.xcassets in Resources */,
-				0018350624ED484B00E0B6A3 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,14 +261,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		0018350424ED484B00E0B6A3 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				0018350524ED484B00E0B6A3 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		0018350924ED484C00E0B6A3 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

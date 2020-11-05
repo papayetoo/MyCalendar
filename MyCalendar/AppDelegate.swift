@@ -15,7 +15,6 @@ import GoogleSignIn
 class AppDelegate: UIResponder, UIApplicationDelegate{
 
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         // FirebaseUI 추가하기 위한 코드
