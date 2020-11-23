@@ -37,6 +37,16 @@ class CalendarViewController: UIViewController {
         return formatter
     }()
     
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        print("make calendarview with init")
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        print("make calendarview with required init")
+    }
+    
     // MARK: viewDidLoad()
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +55,9 @@ class CalendarViewController: UIViewController {
         let eventStore = EKEventStore()
         // eventStore의 접근권한을 얻는 코드 requestAccess
         // info.plist에 Privacy 선언 필요.
-        let lastMonth = self.calendar.date(byAdding: DateComponents(month:-1), to: self.currentDate)!
+        
+        var holidays : [Date] = []
+        self.calendarView.contentSize = CGSize(width: self.view.frame.width, height: 800)
         
         eventStore.requestAccess(to: .event) {
             (granted, error) in
@@ -53,7 +65,7 @@ class CalendarViewController: UIViewController {
                 // 아이폰 기본 캘릭더에 있는 event 정보를 얻어올 수 있음.
                 let eventCalendars = eventStore.calendars(for: .event)
                 // 현재 달의 초일부터 말일까지의 행사를 받아옴.
-                let predicate = eventStore.predicateForEvents(withStart: lastMonth.startOfMonth, end: lastMonth.endOfMonth, calendars: eventCalendars)
+                let predicate = eventStore.predicateForEvents(withStart: self.currentDate.startOfMonth, end: self.currentDate.endOfMonth, calendars: eventCalendars)
                 // predicate에 맞는 event를 가져옴.
                 let events = eventStore.events(matching: predicate)
                 for event in events{
@@ -64,8 +76,20 @@ class CalendarViewController: UIViewController {
                             continue
                         }
                         
-                        let oneDay = DateComponents(day:1)
-                        var currentHoliday = eventStart
+                        var current = eventStart
+                        var iterYear = self.calendar.component(.year, from: current)
+                        let endYear = self.calendar.component(.year, from: eventEnd)
+                        var iterMonth = self.calendar.component(.month, from: current)
+                        let endMonth = self.calendar.component(.month, from: eventEnd)
+                        var iterDay = self.calendar.component(.day, from: current)
+                        let endDay = self.calendar.component(.day, from: eventEnd)
+                        while iterYear <= endYear && iterMonth <= endMonth && iterDay <= endDay{
+                            current += 24 * 60
+                            print(current)
+                            iterYear = self.calendar.component(.year, from: current)
+                            iterMonth = self.calendar.component(.month, from: current)
+                            iterDay = self.calendar.component(.day, from: current)
+                        }
                         
                     }
                 }
@@ -77,7 +101,7 @@ class CalendarViewController: UIViewController {
         }
     
         
-        self.setLabelLegnth()
+//        self.setLabelLegnth()
         self.calendarView.dataSource = self
         self.calendarView.delegate = self
 
@@ -88,7 +112,6 @@ class CalendarViewController: UIViewController {
             .filter { $0.year != nil && $0.month != nil }
             .subscribe(onNext: { d in
                 self.yearLabel.text = "\(d.year!)년"
-                self.monthLabel.text = "\(d.month!)월"
             })
             .disposed(by: disposeBag)
 
@@ -127,9 +150,9 @@ class CalendarViewController: UIViewController {
         if self.yearLabel.adjustsFontSizeToFitWidth == false {
             self.yearLabel.adjustsFontSizeToFitWidth = true
         }
-        if self.monthLabel.adjustsFontSizeToFitWidth == false{
-            self.monthLabel.adjustsFontSizeToFitWidth = true
-        }
+//        if self.monthLabel.adjustsFontSizeToFitWidth == false{
+//            self.monthLabel.adjustsFontSizeToFitWidth = true
+//        }
     }
     
     @objc func swipeAction(_ sender: UISwipeGestureRecognizer){
@@ -144,6 +167,45 @@ class CalendarViewController: UIViewController {
         
         self.currentDate = Calendar(identifier: .gregorian).date(byAdding: components, to: self.currentDate.startOfMonth)!
         self.dateBehaviorSubject.onNext(self.currentDate)
+        var holidays : [Date] = []
+        let eventStore = EKEventStore()
+        
+        // 아이폰 기본 캘릭더에 있는 event 정보를 얻어올 수 있음.
+        let eventCalendars = eventStore.calendars(for: .event)
+        // 현재 달의 초일부터 말일까지의 행사를 받아옴.
+        let predicate = eventStore.predicateForEvents(withStart: self.currentDate.startOfMonth, end: self.currentDate.endOfMonth, calendars: eventCalendars)
+        // predicate에 맞는 event를 가져옴.
+        let events = eventStore.events(matching: predicate)
+        for event in events{
+            // 대한민국 공휴일만을 가져옴.
+            print(event)
+            if event.calendar.title == "대한민국 공휴일"{
+            
+                guard let eventStart = event.startDate, let eventEnd = event.endDate else {
+                    continue
+                }
+                print(eventStart, eventEnd)
+                var current = eventStart.toLocalTime()
+                var iterYear = self.calendar.component(.year, from: current)
+                let endYear = self.calendar.component(.year, from: eventEnd)
+                var iterMonth = self.calendar.component(.month, from: current)
+                let endMonth = self.calendar.component(.month, from: eventEnd)
+                var iterDay = self.calendar.component(.day, from: current)
+                let endDay = self.calendar.component(.day, from: eventEnd)
+                while iterYear <= endYear && iterMonth <= endMonth && iterDay <= endDay{
+                    holidays.append(current)
+                    current += 24 * 60 * 60
+                    iterYear = self.calendar.component(.year, from: current)
+                    iterMonth = self.calendar.component(.month, from: current)
+                    iterDay = self.calendar.component(.day, from: current)
+                }
+            }
+            print("Holidays", holidays)
+        }
+                
+
+    
+        
         self.calendarView.reloadData()
     }
     
@@ -208,6 +270,7 @@ extension Date{
 
 extension CalendarViewController: UICollectionViewDataSource {
     
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         let calendarEndDate = Calendar(identifier: .gregorian).date(byAdding: DateComponents(day:1), to: self.endDate!)
@@ -250,12 +313,46 @@ extension CalendarViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0.3, left: 0.3, bottom: 0, right: 0.3)
     }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let dateCell = collectionView.cellForItem(at: indexPath)
+        dateCell?.isSelected = true
+        collectionView.reloadData()
+    }
+    
+    
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        // UICollectionView HeaderView 또는 FooterView 만드는 코드
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "calendarHeaderView", for: indexPath) as? HeaderView else {return UICollectionReusableView()}
+            headerView.monthLabel.text = "\(self.currentDate.month)"
+            return headerView
+        case UICollectionView.elementKindSectionFooter:
+            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "calendarFooterView", for: indexPath)
+            return footerView
+        default:
+            assert(false, "응 아니야")
+        }
+    }
 }
 
 extension CalendarViewController : UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = self.view.frame.width - 20
-        return CGSize(width: width / 7, height: 100)
+        guard let isCellSelected = collectionView.cellForItem(at: indexPath)?.isSelected else{
+            print("Cell selected")
+            let cellSelected = collectionView.cellForItem(at: indexPath)
+            cellSelected?.contentView.backgroundColor = .systemPink
+            return CGSize(width: width / 7, height: 30)}
+        if isCellSelected == false {
+            return CGSize(width: width / 7, height: 30)
+        }
+        return CGSize(width: 100, height: 100)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

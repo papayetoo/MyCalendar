@@ -18,8 +18,7 @@ class DateCell: UICollectionViewCell {
         super.init(coder: coder)
         self.contentView.layer.masksToBounds = true
         self.contentView.layer.cornerRadius = CGFloat(10)
-        self.contentView.layer.borderWidth = CGFloat(1.2)
-        self.contentView.layer.borderColor = UIColor.blue.cgColor
+        self.contentView.layer.borderWidth = CGFloat(0.12)
         print("Make Date Cell")
     }
     

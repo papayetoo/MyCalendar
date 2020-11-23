@@ -12,10 +12,13 @@
 		0018350324ED484B00E0B6A3 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0018350224ED484B00E0B6A3 /* CalendarViewController.swift */; };
 		0018350824ED484C00E0B6A3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0018350724ED484C00E0B6A3 /* Assets.xcassets */; };
 		0018350B24ED484C00E0B6A3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0018350924ED484C00E0B6A3 /* LaunchScreen.storyboard */; };
+		007B7C84256BF6AB00A29D8A /* EmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007B7C83256BF6AB00A29D8A /* EmojiTextField.swift */; };
+		0098F04C255FE10600CBBE0C /* EmailSignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0098F04B255FE10600CBBE0C /* EmailSignUpViewController.swift */; };
 		00DE743E2537267300A7166D /* DateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00DE743D2537267300A7166D /* DateCell.swift */; };
 		00E263CB2550381A009AF471 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E263CA2550381A009AF471 /* AuthViewController.swift */; };
 		00E263CE25503CBF009AF471 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00E263CD25503CBF009AF471 /* Auth.storyboard */; };
 		00E263D325517A1A009AF471 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00E263D225517A1A009AF471 /* GoogleService-Info.plist */; };
+		00F7993D25654A46000A8623 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F7993C25654A46000A8623 /* HeaderView.swift */; };
 		3B819561C2266C316141EB4F /* Pods_MyCalendar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26EC41A4609D6F19B66E6288 /* Pods_MyCalendar.framework */; };
 /* End PBXBuildFile section */
 
@@ -27,10 +30,13 @@
 		0018350724ED484C00E0B6A3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0018350A24ED484C00E0B6A3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0018350C24ED484C00E0B6A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		007B7C83256BF6AB00A29D8A /* EmojiTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiTextField.swift; sourceTree = "<group>"; };
+		0098F04B255FE10600CBBE0C /* EmailSignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailSignUpViewController.swift; sourceTree = "<group>"; };
 		00DE743D2537267300A7166D /* DateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateCell.swift; sourceTree = "<group>"; };
 		00E263CA2550381A009AF471 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		00E263CD25503CBF009AF471 /* Auth.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
 		00E263D225517A1A009AF471 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		00F7993C25654A46000A8623 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		26EC41A4609D6F19B66E6288 /* Pods_MyCalendar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyCalendar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3518847DEF8D664B5699CA09 /* Pods-MyCalendar.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyCalendar.release.xcconfig"; path = "Target Support Files/Pods-MyCalendar/Pods-MyCalendar.release.xcconfig"; sourceTree = "<group>"; };
 		B7737A5561B501C5DA130C15 /* Pods-MyCalendar.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyCalendar.debug.xcconfig"; path = "Target Support Files/Pods-MyCalendar/Pods-MyCalendar.debug.xcconfig"; sourceTree = "<group>"; };
@@ -84,9 +90,13 @@
 		002A2D3325542C9200DD97F1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				00DE743D2537267300A7166D /* DateCell.swift */,
 				00E263CD25503CBF009AF471 /* Auth.storyboard */,
 				00E263CA2550381A009AF471 /* AuthViewController.swift */,
 				0018350224ED484B00E0B6A3 /* CalendarViewController.swift */,
+				0098F04B255FE10600CBBE0C /* EmailSignUpViewController.swift */,
+				00F7993C25654A46000A8623 /* HeaderView.swift */,
+				007B7C83256BF6AB00A29D8A /* EmojiTextField.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -94,7 +104,6 @@
 		00DE743C2537264300A7166D /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				00DE743D2537267300A7166D /* DateCell.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -253,8 +262,11 @@
 				0018350324ED484B00E0B6A3 /* CalendarViewController.swift in Sources */,
 				001834FF24ED484B00E0B6A3 /* AppDelegate.swift in Sources */,
 				0018350124ED484B00E0B6A3 /* SceneDelegate.swift in Sources */,
+				0098F04C255FE10600CBBE0C /* EmailSignUpViewController.swift in Sources */,
+				007B7C84256BF6AB00A29D8A /* EmojiTextField.swift in Sources */,
 				00E263CB2550381A009AF471 /* AuthViewController.swift in Sources */,
 				00DE743E2537267300A7166D /* DateCell.swift in Sources */,
+				00F7993D25654A46000A8623 /* HeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +406,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WBV5N68S3R;
 				INFOPLIST_FILE = MyCalendar/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -413,6 +426,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WBV5N68S3R;
 				INFOPLIST_FILE = MyCalendar/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
